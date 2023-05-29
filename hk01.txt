@@ -23,10 +23,10 @@ oracle@egoradwdev2:nothing:/home/oracle> ssh -i hk1218.pem ec2-user@35.153.126.2
 [root@ip-10-0-0-187 dev]# mkdir -p /ora_backup
 [root@ip-10-0-0-187 dev]# mkdir /oraInventory
 [root@ip-10-0-0-187 dev]# mkdir -p /oracle
-[root@ip-10-0-0-187 dev]# mkdir -p /oracle/12102
+[root@ip-10-0-0-187 dev]# mkdir -p /oracle/19300
 [root@ip-10-0-0-187 dev]#
 [root@ip-10-0-0-187 dev]# mkdir -p /grid
-[root@ip-10-0-0-187 dev]# mkdir -p /grid/12102
+[root@ip-10-0-0-187 dev]# mkdir -p /grid/19300
 [root@ip-10-0-0-187 dev]#
 [root@ip-10-0-0-187 dev]# chown -R oracle:oinstall /oraInventory
 [root@ip-10-0-0-187 dev]# chown -R oracle:oinstall /oracle
@@ -39,8 +39,7 @@ oracle@egoradwdev2:nothing:/home/oracle> ssh -i hk1218.pem ec2-user@35.153.126.2
 [root@ip-10-0-0-187 ~]# /sbin/mkfs -t ext4 /dev/xvdb1
 [root@ip-10-0-0-187 ~]# /sbin/mkfs -t ext4 /dev/xvdc1
 [root@ip-10-0-0-187 ~]# mount /dev/xvdb1 /oracle
-[root@ip-10-0-0-187 ~]# mount /dev/xvdc1 /oracle/12102
-[root@ip-10-0-0-187 ~]# mount /dev/xvdc1 /oracle/12102
+[root@ip-10-0-0-187 ~]# mount /dev/xvdc1 /oracle/19300
 [root@ip-10-0-0-187 ~]# chown -R oracle:oinstall /oraInventory
 [root@ip-10-0-0-187 ~]# chown -R oracle:oinstall /oracle
 [root@ip-10-0-0-187 ~]# chown -R oracle:oinstall /oracle/12102
