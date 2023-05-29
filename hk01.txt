@@ -3,3 +3,191 @@ test1test1
 ec2-52-201-222-96.compute-1.amazonaws.com
 
 ec2-52-91-162-222.compute-1.amazonaws.com
+
+
+oracle@egoradwdev2:nothing:/home/oracle> ssh -i hk1218.pem ec2-user@35.153.126.234
+
+[ec2-user@ip-10-0-0-187 ~]$ sudo su - root
+[root@ip-10-0-0-187 ~]# df -h
+[root@ip-10-0-0-187 ~]# cd /dev/
+[root@ip-10-0-0-187 dev]# ls -lrt xv*
+
+[root@ip-10-0-0-187 dev]# fdisk /dev/xvdb     ---> n p w
+[root@ip-10-0-0-187 dev]# fdisk /dev/xvdc     ---> n p w
+[root@ip-10-0-0-187 dev]# lsblk
+[root@ip-10-0-0-187 dev]# groupadd oinstall
+[root@ip-10-0-0-187 dev]# useradd oracle
+[root@ip-10-0-0-187 dev]# useradd grid
+[root@ip-10-0-0-187 dev]# usermod -aG oinstall oracle
+[root@ip-10-0-0-187 dev]# usermod -aG oinstall grid
+[root@ip-10-0-0-187 dev]# mkdir -p /ora_backup
+[root@ip-10-0-0-187 dev]# mkdir /oraInventory
+[root@ip-10-0-0-187 dev]# mkdir -p /oracle
+[root@ip-10-0-0-187 dev]# mkdir -p /oracle/12102
+[root@ip-10-0-0-187 dev]#
+[root@ip-10-0-0-187 dev]# mkdir -p /grid
+[root@ip-10-0-0-187 dev]# mkdir -p /grid/12102
+[root@ip-10-0-0-187 dev]#
+[root@ip-10-0-0-187 dev]# chown -R oracle:oinstall /oraInventory
+[root@ip-10-0-0-187 dev]# chown -R oracle:oinstall /oracle
+[root@ip-10-0-0-187 dev]# chown -R oracle:oinstall /oracle/12102
+[root@ip-10-0-0-187 dev]#
+[root@ip-10-0-0-187 dev]# chown -R grid:oinstall /grid
+[root@ip-10-0-0-187 dev]# chown -R grid:oinstall /grid/12102
+[root@ip-10-0-0-187 dev]# chown -R oracle:oinstall /ora_backup
+[root@ip-10-0-0-187 dev]#
+[root@ip-10-0-0-187 ~]# /sbin/mkfs -t ext4 /dev/xvdb1
+[root@ip-10-0-0-187 ~]# /sbin/mkfs -t ext4 /dev/xvdc1
+[root@ip-10-0-0-187 ~]# mount /dev/xvdb1 /oracle
+[root@ip-10-0-0-187 ~]# mount /dev/xvdc1 /oracle/12102
+[root@ip-10-0-0-187 ~]# mount /dev/xvdc1 /oracle/12102
+[root@ip-10-0-0-187 ~]# chown -R oracle:oinstall /oraInventory
+[root@ip-10-0-0-187 ~]# chown -R oracle:oinstall /oracle
+[root@ip-10-0-0-187 ~]# chown -R oracle:oinstall /oracle/12102
+[root@ip-10-0-0-187 dev]#
+[root@ip-10-0-0-187 dev]#
+#Attach that extra volume to EC2 instance 
+[root@ip-10-0-0-187 dev]#
+[root@ip-10-0-0-187 ~]# vi /etc/fstab
+/dev/xvdb1       /oracle           ext4    defaults        0 0
+/dev/xvdc1       /oracle/12102           ext4    defaults        0 0
+/dev/xvdf1     /ora_backup ext4        defaults        0 0
+[root@ip-10-0-0-187 dev]#
+[root@ip-10-0-0-187 dev]#
+[root@ip-10-0-0-187 dev]#
+---------------------------------------------------------------------------------
+=============================
+[root@ip-10-0-0-47 ~]# vi /etc/pam.d/login
+session required pam_limits.so
+===============================================
+vi /etc/security/limits.conf
+oracle  soft  nproc   16384
+oracle  hard  nproc   16384
+oracle  soft  nofile  1024
+oracle  hard  nofile  65536
+oracle  soft  stack   10240
+oracle  hard  stack   32768
+grid    soft  nproc   16384
+grid    hard  nproc   16384
+grid    soft  nofile  1024
+grid    hard  nofile  65536
+grid    soft  stack   10240
+grid    hard  stack   32768
+oracle  hard  memlock 512000
+oracle  soft  memlock 512000
+===============================================
+vi /etc/sysctl.conf
+fs.file-max = 6815744
+kernel.sem=250 32000 100 128
+kernel.shmmni=4096
+kernel.shmall=1073741824
+kernel.shmmax=4398046511104
+kernel.panic_on_oops=1
+net.core.rmem_default=262144
+net.core.rmem_max=4194304
+net.core.wmem_default=262144
+net.core.wmem_max=1048576
+fs.aio-max-nr=1048576
+net.ipv4.conf.all.rp_filter=1
+net.ipv4.conf.default.rp_filter=1
+net.ipv4.ip_local_port_range = 9000 65500
+===============================================
+[root@hkoradev ~]# /sbin/sysctl -p
+===============================================
+
+===============================================
+copied /mis/bin from egoradwdev2 to AWS
+copied /ora_backup/dist to AWS
+copied /home/oracle/.bashrc & .bash_profile to AWS
+============================================
+install db software
+reboot
+create db
+==================================================
+#once done connect through sql developer with following seettings
+https://stackoverflow.com/questions/52885656/how-to-connect-to-an-oracle-database-running-on-amazon-aws-ec2
+https://blogs.oracle.com/dbcs/connecting-to-a-database-cloud-service-with-sql-developer-and-ssh
+
+=====================================
+/dev/xvdd1       /grid           ext4    defaults        0 0
+/dev/xvde1      /grid/12102           ext4    defaults        0 0
+/dev/xvdb1       /oracle           ext4    defaults        0 0
+/dev/xvdc1       /oracle/12102           ext4    defaults        0 0
+/dev/xvdf1     /oracle/middleware ext4        defaults        0 0
+/dev/xvdg1     /ora_backup ext4        defaults        0 0
+=======================================
+#start asm 
+oracleasm configure -i
+oracleasm init
+lsmod | grep asm
+[root@oracleeg ~]# oracleasm createdisk DISK000 /dev/nvme6n1p1
+Writing disk header: done
+Instantiating disk: done
+[root@oracleeg ~]# oracleasm listdisks
+DISK000
+[root@oracleeg ~]# 
+[root@oracleeg ~]# ll /etc/sysconfig/oracleasm
+=======================================
+rm -rf /grid/12102/OPatch
+rm -rf /oracle/12102/OPatch
+------------------------------
+chown grid:oinstall /grid
+chown grid:oinstall /grid/12102
+------------------------------
+[root@oracleeg 28813884]# touch /tmp/fuser
+[root@oracleeg 28813884]# echo $PATH
+/opt/boksm/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin
+[root@oracleeg 28813884]# export PATH=$PATH:/tmp
+[root@oracleeg 28813884]#
+[root@oracleeg 28813884]# echo $PATH
+/opt/boksm/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin:/tmp
+[root@oracleeg 28813884]#
+
+-----------------------------------
+#as root, patching grid home
+[node1,node2]: /grid/12102/OPatch/opatchauto apply -analyze /ora_backup/grid_oracle_patch/28813884 -oh /grid/12102
+[node1,node2]: /grid/12102/OPatch/opatchauto apply /ora_backup/grid_oracle_patch/28813884 -oh /grid/12102
+
+
+#as root, patching oracle home
+[node1,node2]: /oracle/12102/OPatch/opatchauto apply -analyze /ora_backup/grid_oracle_patch/28813884 -oh /oracle/12102
+[node1,node2]: /oracle/12102/OPatch/opatchauto apply /ora_backup/grid_oracle_patch/28813884 -oh /oracle/12102
+============================
+SID_LIST_LISTENER =
+        ( SID_LIST =
+                ( SID_DESC =
+                        ( ORACLE_HOME = /oracle/12102 )
+                        ( SID_NAME = cegtstx)
+                )
+        )
+=========================
+https://aws.amazon.com/premiumsupport/knowledge-center/ec2-memory-swap-file/
+$ sudo dd if=/dev/zero of=/swapfile bs=128M count=32
+$ sudo chmod 600 /swapfile
+$ sudo mkswap /swapfile
+$ sudo swapon /swapfile
+$ sudo swapon -s
+$ sudo vi /etc/fstab
+/swapfile swap swap defaults 0 0
+--------------
+export CV_ASSUME_DISTID=RHEL7.6
+export ORACLE_BASE=/oracle
+export ORACLE_HOME=/oracle/19300
+export PATH=/usr/sbin:$PATH
+export PATH=$ORACLE_HOME/bin:$PATH
+export LD_LIBRARY_PATH=$ORACLE_HOME/lib:/lib:/usr/lib
+export CLASSPATH=$ORACLE_HOME/jlib:$ORACLE_HOME/rdbms/jlib
+export TMP=/tmp
+export TMPDIR=$TMP
+------------
+[oracle@ip-172-32-251-229 ~]$
+[oracle@ip-172-32-251-229 ~]$
+[oracle@ip-172-32-251-229 ~]$ mkdir .ssh
+[oracle@ip-172-32-251-229 ~]$ chmod 700 .ssh
+[oracle@ip-172-32-251-229 ~]$ touch .ssh/authorized_keys
+[oracle@ip-172-32-251-229 ~]$ chmod 600 .ssh/authorized_keys
+[oracle@ip-172-32-251-229 ~]$
+[oracle@ip-172-32-251-229 ~]$
+oracle@egoradwdev2:nothing:/home/oracle> ssh-keygen -y
+-----------------
+
