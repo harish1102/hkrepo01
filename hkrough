@@ -1,0 +1,17 @@
+from aws_cdk import core
+from aws_cdk import aws_ec2 as ec2
+
+class VpcListerStack(core.Stack):
+    def __init__(self, scope: core.Construct, id: str, **kwargs) -> None:
+        super().__init__(scope, id, **kwargs)
+
+        # List all VPCs in the region
+        vpcs = ec2.Vpc.from_lookup(self, "VPCs", is_default=False)
+
+        # Print out details of each VPC
+        for vpc in vpcs:
+            print(f"VPC ID: {vpc.vpc_id}, VPC CIDR: {vpc.vpc_cidr_block}")
+
+app = core.App()
+VpcListerStack(app, "VpcListerStack")
+app.synth()
